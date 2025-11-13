@@ -25,11 +25,12 @@ Display results neatly on the frontend.
 ✅ Handles multiple image formats (.jpg, .jpeg, .png)
 ✅ Supports both frontend UI and API-based use
 
-⚙️ Tech Stack
-Layer	Technology
-Backend Framework	Spring Boot
-Language	Java 17+
-AI API	Google Gemini API
-Build Tool	Maven / Gradle
-Frontend (optional)	HTML, CSS, JavaScript
-REST Client (for testing)	Postman / cURL
+| Layer                         | Technology            |
+| ----------------------------- | --------------------- |
+| **Backend Framework**         | Spring Boot           |
+| **Language**                  | Java 17+              |
+| **AI API**                    | Google Gemini API     |
+| **Build Tool**                | Maven / Gradle        |
+| **Frontend (optional)**       | HTML, CSS, JavaScript |
+| **REST Client (for testing)** | Postman / cURL        |
+
