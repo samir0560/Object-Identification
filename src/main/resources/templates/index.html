@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Object Identification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+
+        /* Profile Sidebar */
+        .profile-sidebar {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            margin: 0 auto 15px;
+        }
+
+        .profile-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .profile-email {
+            color: #666;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+
+        .profile-stats {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .stat-value {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Upload Card */
+        .upload-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .upload-card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            background: #f8f9ff;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+        }
+
+        .upload-area.dragover {
+            border-color: #764ba2;
+            background: #e8ebff;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+            margin-top: 15px;
+        }
+
+        .file-label:hover {
+            transform: scale(1.05);
+        }
+
+        .file-info {
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .preview-area {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .result-area {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .result-text {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .error-message {
+            margin-top: 20px;
+            padding: 15px;
+            background: #ffe6e6;
+            border-left: 4px solid #ff4444;
+            border-radius: 5px;
+            color: #cc0000;
+        }
+
+        .success-message {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e6ffe6;
+            border-left: 4px solid #44ff44;
+            border-radius: 5px;
+            color: #006600;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 10px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        /* History Card */
+        .history-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .history-card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .history-item {
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s ease;
+        }
+
+        .history-item:hover {
+            transform: translateX(5px);
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .history-item-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .history-item-date {
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .history-item-result {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+
+        .history-item-file {
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        .empty-history {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-history-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .dashboard-container {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-sidebar {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Profile Sidebar -->
+        <div class="profile-sidebar">
+            <div class="profile-header">
+                <div class="profile-avatar">👤</div>
+                <div class="profile-name" th:text="${userName != null ? userName : 'User Profile'}">User Profile</div>
+                <div class="profile-email" th:text="${userEmail}">user@example.com</div>
+            </div>
+
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Total Identifications</span>
+                    <span class="stat-value" th:text="${history != null ? history.size() : 0}">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">This Month</span>
+                    <span class="stat-value" th:text="${history != null ? history.size() : 0}">0</span>
+                </div>
+            </div>
+
+            <form th:action="@{/logout}" method="post" style="margin: 0;">
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Upload Card -->
+            <div class="upload-card">
+                <h2>🔍 Identify Object</h2>
+                <p style="color: #666; margin-bottom: 20px;">Upload an image to identify what it contains</p>
+
+                <form th:action="@{/upload}" method="post" enctype="multipart/form-data" id="uploadForm">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📷</div>
+                        <p style="color: #666; margin-bottom: 15px;">Drag and drop your image here or click to browse</p>
+                        <input type="file" id="fileInput" name="image" accept="image/*" class="file-input" required>
+                        <label for="fileInput" class="file-label">Choose Image</label>
+                        <div class="file-info" id="fileInfo"></div>
+                    </div>
+
+                    <div class="preview-area" id="previewArea" style="display: none;">
+                        <img id="previewImage" class="preview-image" alt="Preview">
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn" disabled>Identify Object</button>
+                </form>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Analyzing image...</div>
+                </div>
+
+                <div th:if="${error}" class="error-message">
+                    <strong>Error:</strong> <span th:text="${error}"></span>
+                </div>
+
+                <div th:if="${success}" class="success-message">
+                    <strong>Success:</strong> <span th:text="${success}"></span>
+                </div>
+
+                <div th:if="${result}" class="result-area">
+                    <div class="result-title">Latest Identification Result:</div>
+                    <div class="result-text" th:text="${result}"></div>
+                </div>
+            </div>
+
+            <!-- History Card -->
+            <div class="history-card">
+                <h2>📋 Identification History</h2>
+                
+                <div th:if="${history == null || history.isEmpty()}" class="empty-history">
+                    <div class="empty-history-icon">📭</div>
+                    <p>No identification history yet. Upload your first image to get started!</p>
+                </div>
+
+                <div th:if="${history != null && !history.isEmpty()}" class="history-list">
+                    <div th:each="item : ${history}" class="history-item">
+                        <div class="history-item-header">
+                            <div class="history-item-title" th:text="${item.result}">Identification Result</div>
+                            <div class="history-item-date" th:text="${#temporals.format(item.createdAt, 'dd-MMM-yyyy HH:mm')}">Date</div>
+                        </div>
+                        <div class="history-item-result" th:text="${item.result}"></div>
+                        <div class="history-item-file" th:text="'File: ' + ${item.fileName}">File name</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const previewArea = document.getElementById('previewArea');
+        const previewImage = document.getElementById('previewImage');
+        const fileInfo = document.getElementById('fileInfo');
+        const submitBtn = document.getElementById('submitBtn');
+        const uploadForm = document.getElementById('uploadForm');
+        const loading = document.getElementById('loading');
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0 && files[0].type.startsWith('image/')) {
+                fileInput.files = files;
+                handleFileSelect(files[0]);
+            }
+        });
+
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file');
+                return;
+            }
+
+            fileInfo.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+            submitBtn.disabled = false;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                previewArea.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        uploadForm.addEventListener('submit', () => {
+            submitBtn.disabled = true;
+            loading.style.display = 'block';
+        });
+    </script>
+</body>
+</html>
+
