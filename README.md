@@ -30,7 +30,7 @@ Display results neatly on the frontend.
 | **Backend Framework**         | Spring Boot           |
 | **Language**                  | Java 17+              |
 | **AI API**                    | Google Gemini API     |
-| **Build Tool**                | Maven / Gradle        |
+| **Build Tool**                | Maven                 |
 | **Frontend (optional)**       | HTML, CSS, JavaScript |
-| **REST Client (for testing)** | Postman / cURL        |
+| **REST Client (for testing)** | Postman               |
 
